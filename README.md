@@ -1,1 +1,1 @@
-Simple recipe book app using Firebase Realtime Database and Node.js
+Simple recipe book app using Firebase Realtime Database, Authentication API, and Node.js
