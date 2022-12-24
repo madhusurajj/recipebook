@@ -1,4 +1,4 @@
-const {addRecipeToBook, removeRecipeFromBook, database} = require ("./database.js");
+const {addRecipeToBook, removeRecipeFromBook, readRecipes, database} = require ("./database.js");
 
 const { signin } = require ("./auth.js");
 
@@ -6,7 +6,7 @@ const {rl} = require ("./readline.js");
 
 function displayMenu  (user)
 {
-    rl.question ("Enter A to add a new recipe, or D to delete recipe, or Q to quit program\n", function (string) {
+    rl.question ("Enter A to add a new recipe, or D to delete recipe, or V to view your recipes, or Q to quit program\n", function (string) {
         if (string == "Q")
         {
             rl.close();
@@ -20,8 +20,12 @@ function displayMenu  (user)
         }
         else if (string == "D")
         {
-            removeRecipeRequest();
+            removeRecipeRequest(user);
             displayMenu();
+        }
+        else if (string == "V")
+        {
+            readRecipes(user, database);
         }
         else
         {
@@ -42,12 +46,12 @@ function addRecipeRequest (user)
       });
 }
 
-function removeRecipeRequest ()
+function removeRecipeRequest (user)
 {
     rl.question("Remove a recipe from recipe book\n", async function (string) {
         recipeName = string;
         console.log("Removing " + recipeName + " from your recipe book...");
-        await removeRecipeFromBook(recipeName, database);
+        await removeRecipeFromBook(user, recipeName, database);
         displayMenu();
       });
 }

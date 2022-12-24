@@ -1,5 +1,5 @@
 const firebase = require('firebase/app');
-const { getDatabase, set, ref, remove} = require('firebase/database');
+const { getDatabase, set, ref, remove, onValue} = require('firebase/database');
 require('firebase/database');
 
 const firebaseConfig = require("./config.json")
@@ -22,7 +22,7 @@ async function addRecipeToBook(user, recipe, database)
 }
 
 //remove from realtime database using reference 
-async function removeRecipeFromBook(recipe, database)
+async function removeRecipeFromBook(user, recipe, database)
 {
     return new Promise ((resolve) => {
         remove(ref(database, 'users/' + user + '/recipes/' + recipe))
@@ -33,4 +33,12 @@ async function removeRecipeFromBook(recipe, database)
     });
 }
 
-module.exports = {database, addRecipeToBook, removeRecipeFromBook};
+//listen for changes in this user's recipe list' and retrieve list
+async function readRecipes (user, database)
+{
+    const userRef = ref (database, 'users/' + user);
+    onValue (userRef, (snapshot) => {
+        console.log (snapshot.val());
+    });
+}
+module.exports = {database, addRecipeToBook, removeRecipeFromBook, readRecipes};
