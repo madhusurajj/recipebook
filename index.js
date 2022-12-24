@@ -1,31 +1,10 @@
-const firebase = require('firebase/app');
-const { getDatabase, set, ref, remove } = require('firebase/database');
-require('firebase/database');
+const {addRecipeToBook, removeRecipeFromBook, database} = require ("./database.js");
 
-const readline = require ('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
+const { signin } = require ("./auth.js");
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDWooMBmoB-vEam73E-UTPfOUBuqroHtCo",
-    authDomain: "starter-5c929.firebaseapp.com",
-    databaseURL: "https://starter-5c929-default-rtdb.firebaseio.com",
-    projectId: "starter-5c929",
-    storageBucket: "starter-5c929.appspot.com",
-    messagingSenderId: "255238054024",
-    appId: "1:255238054024:web:cd8efd0081a74b1851ff3d",
-    measurementId: "G-WGY79YKNL7"
-};
+const {rl} = require ("./readline.js");
 
-const app = firebase.initializeApp(firebaseConfig);
-const database = getDatabase(app);
-
-
-// question user to enter name
-exitMenu = false;
-const displayMenu = function ()
+function displayMenu  (user)
 {
     rl.question ("Enter A to add a new recipe, or D to delete recipe, or Q to quit program\n", function (string) {
         if (string == "Q")
@@ -35,7 +14,7 @@ const displayMenu = function ()
         }
         else if (string == "A")
         {
-            addRecipeRequest();
+            addRecipeRequest(user);
             console.log("added")
             displayMenu();
         }
@@ -53,43 +32,24 @@ const displayMenu = function ()
 }
 
 
-function addRecipeRequest ()
+function addRecipeRequest (user)
 {
-    rl.question("Add a new recipe to recipebook\n", function (string) {
+    rl.question("Add a new recipe to recipebook\n", async function (string) {
         recipeName = string;
         console.log("Adding " + recipeName + " to your recipe book...");
-        addRecipeToBook(recipeName);
+        await addRecipeToBook(user, recipeName, database);
+        displayMenu();
       });
 }
 
 function removeRecipeRequest ()
 {
-    rl.question("Remove a recipe from recipe book\n", function (string) {
+    rl.question("Remove a recipe from recipe book\n", async function (string) {
         recipeName = string;
         console.log("Removing " + recipeName + " from your recipe book...");
-        removeRecipeFromBook(recipeName);
+        await removeRecipeFromBook(recipeName, database);
+        displayMenu();
       });
 }
 
-function addRecipeToBook(recipe)
-{
-    set(ref(database, 'recipes/' + recipe), {
-        recipeName: recipe
-      })
-    .then (() => {
-        console.log("done!");
-        displayMenu();
-    })
-}
-
-//remove from realtime database using reference 
-function removeRecipeFromBook(recipe)
-{
-    remove(ref(database, 'recipes/' + recipe))
-    .then (() => {
-        console.log("done!");
-        displayMenu();
-    })
-}
-
-displayMenu();
+signin(displayMenu, rl);
