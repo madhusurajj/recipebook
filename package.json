@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/madhusurajj/recipebook/issues"
   },
-  "homepage": "https://github.com/madhusurajj/recipebook#readme"
+  "homepage": "https://github.com/madhusurajj/recipebook#readme",
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
 }
