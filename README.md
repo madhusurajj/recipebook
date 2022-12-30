@@ -1,1 +1,1 @@
-REST APIs for a recipe book web application using Node.js, Express.js and Firebase Realtime Database.
+Project creating REST APIs for a recipe book web application using Node.js, Express.js and Firebase Realtime Database.
