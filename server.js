@@ -13,7 +13,7 @@ app.use(cors({
 //HTTP GET response to get all recipes created by a user
 app.get('/users/:userID', cors(), (req, res) => {
     const userID = req.params.userID;
-    readRecipes(userID)
+    readRecipes(userID, req.query.ingredient)
     .then ((data) =>
     {
         res.status(200).json(data);
