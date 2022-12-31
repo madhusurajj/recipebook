@@ -7,6 +7,8 @@ const firebaseConfig = require("./firebase-config.json")
 const app = firebase.initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
+const {filterForIngredients} = require("./util.js");
+
 //add to realtime database using reference with user id
 async function addRecipeToBook(user, recipe)
 {
@@ -39,16 +41,26 @@ async function removeRecipeFromBook(user, recipe)
 }
 
 //listen for changes in this user's recipe list' and retrieve list
-function readRecipes (user)
+//filterKeywords: optional parameter allows users to selectively view recipes that contain keywords
+function readRecipes (user, filterKeywords = null)
 {
     const userRef = ref (database, 'users/' + user);
     return new Promise ((resolve, reject) => {
-        onValue (userRef, (snapshot) => {
+         onValue (userRef, (snapshot) => {
             if (snapshot.exists())
             {
-                const data = JSON.stringify(snapshot.val());
-                console.log(data);
-                resolve(data);
+                var data = snapshot.val();
+                if (filterKeywords != null)
+                {
+                    data = filterForIngredients(data, filterKeywords)
+                    .then((filteredData) => {
+                        resolve(filteredData);
+                    }); 
+                }
+                else
+                {
+                    resolve(data);
+                }
             }
             else
             {
