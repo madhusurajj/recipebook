@@ -1,6 +1,6 @@
 const firebase = require('firebase/app');
-const { getDatabase, set, ref, remove, onValue} = require('firebase/database');
-require('firebase/database');
+const { getDatabase, set, ref, remove, onValue, startAt, endAt, push, equalTo} = require('firebase/database');
+const {query, orderByChild} = require('firebase/database');
 
 const firebaseConfig = require("./firebase-config.json")
 
@@ -10,12 +10,13 @@ const database = getDatabase(app);
 const {filterForIngredients} = require("./util.js");
 
 //add to realtime database using reference with user id
-async function addRecipeToBook(user, recipe)
+//add/update ingredients with optional param
+async function addRecipeToBook(user, recipeName, ingredients = null)
 {
     return new Promise ((resolve) => {
-        set(ref(database, 'users/' + user + '/recipes/' + recipe), {
-            recipeName: recipe
-          })
+        set(ref (database, 'users/' + user + '/recipes/' + recipeName), 
+            ingredients
+        )
         .then (() => {
             resolve();
         })
