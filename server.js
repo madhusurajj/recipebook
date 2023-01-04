@@ -11,13 +11,19 @@ app.use(cors({
     origin: "localhost:4200"
 })); 
 
-//middleware to parse JSON post request body
+// // configure the app to use bodyParser()
+// app.use(bodyParser.urlencoded({
+//     extended: true
+// }));
+
+//middleware to parse JSON post req body
 app.use(bodyParser.json());
 
 //HTTP GET response to get all recipes created by a user
+//filter by prep time with query
 app.get('/users/:userID', cors(), (req, res) => {
     const userID = req.params.userID;
-    readRecipes(userID, req.query.ingredient)
+    readRecipes(userID, req.query.preptime)
     .then ((data) =>
     {
         res.status(200).json(data);

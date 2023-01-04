@@ -42,32 +42,20 @@ async function removeRecipeFromBook(user, recipe)
 }
 
 //listen for changes in this user's recipe list' and retrieve list
-//filterKeywords: optional parameter allows users to selectively view recipes that contain keywords
-function readRecipes (user, filterKeywords = null)
+//prepTime: optional parameter allows users to filter by length of preparation
+function readRecipes (user, prepTime = null)
 {
-    const userRef = ref (database, 'users/' + user);
     return new Promise ((resolve, reject) => {
-         onValue (userRef, (snapshot) => {
+         onValue (query(ref(database, 'users/' + user + '/recipes'), orderByChild("prep-time"),equalTo(prepTime)), (snapshot) => {
             if (snapshot.exists())
             {
-                var data = snapshot.val();
-                if (filterKeywords != null)
-                {
-                    data = filterForIngredients(data, filterKeywords)
-                    .then((filteredData) => {
-                        resolve(filteredData);
-                    }); 
-                }
-                else
-                {
-                    resolve(data);
-                }
+                resolve(snapshot.val());
             }
             else
             {
                 reject("Data at this reference doesn't exist");
             }
-        })
+        });
     });
 }
 module.exports = {database, addRecipeToBook, removeRecipeFromBook, readRecipes};
