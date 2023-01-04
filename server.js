@@ -2,6 +2,7 @@ const {readRecipes, addRecipeToBook, removeRecipeFromBook} = require ("./databas
 
 const express = require('express');
 const cors = require ('cors');
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -9,6 +10,9 @@ const app = express();
 app.use(cors({
     origin: "localhost:4200"
 })); 
+
+//middleware to parse JSON post request body
+app.use(bodyParser.json());
 
 //HTTP GET response to get all recipes created by a user
 app.get('/users/:userID', cors(), (req, res) => {
@@ -27,7 +31,7 @@ app.get('/users/:userID', cors(), (req, res) => {
 
 //HTTP POST response to create new recipes
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
-    addRecipeToBook (req.params.userID, req.params.recipeName)
+    addRecipeToBook (req.params.userID, req.params.recipeName, req.body)
     .then (() =>
     {
         res.status(201).send({message: "Succcessfully added recipe"});
