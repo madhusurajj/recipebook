@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 //filter by prep time with query
 app.get('/users/:userID', cors(), (req, res) => {
     const userID = req.params.userID;
-    readRecipes(userID, req.query.preptime)
+    readRecipes(userID, req.query.ingredient)
     .then ((data) =>
     {
         res.status(200).json(data);
@@ -37,10 +37,10 @@ app.get('/users/:userID', cors(), (req, res) => {
 
 //HTTP POST response to create new recipes
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
-    addRecipeToBook (req.params.userID, req.params.recipeName, req.body)
+    addRecipeToBook (req.params.userID, req.params.recipeName, null)
     .then (() =>
     {
-        res.status(201).send({message: "Succcessfully added recipe"});
+        res.status(201).send({message: "Successfully added recipe"});
     })
     .catch (() => 
     {
@@ -51,9 +51,9 @@ app.post('/users/:userID/:recipeName', cors(), (req, res) => {
 //HTTP DELETE response to create new recipes
 app.delete('/users/:userID/:recipeName', cors(), (req, res) => {
     removeRecipeFromBook (req.params.userID, req.params.recipeName)
-    .then (() =>
+    .then ((message) =>
     {
-        res.status(204).send({message: "Succcessfully deleted recipe"});
+        res.status(204).send(message);
     })
     .catch ((message) => 
     {
