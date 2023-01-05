@@ -1,5 +1,5 @@
 const firebase = require('firebase/app');
-const { getFirestore, collection, setDoc, query, doc, deleteDoc, getDocs, where} = require("firebase/firestore");
+const { getFirestore, collection, setDoc, query, doc, deleteDoc, getDoc, getDocs, where} = require("firebase/firestore");
 
 const firebaseConfig = require("./firebase-config.json")
 
@@ -56,15 +56,41 @@ function readRecipes (user)
 {
     let recipesAsJson = {};
     return new Promise (async (resolve, reject) => {
-        const q = query(collection(database, "recipes"), where("userID", "==", user), where("ingredients", "array-contains", ingredient));
+        const q = query(collection(database, "recipes"), where("userID", "==", user));
         const querySnapshot = await getDocs(q);
         let enumeration = 0;
         querySnapshot.forEach((doc) => {
             recipesAsJson[enumeration] = doc.data();
             enumeration++;
         });
+        console.log(recipesAsJson);
         resolve(recipesAsJson);
     });
 }
 
-module.exports = {database, addRecipeToBook, removeRecipeFromBook, readRecipes};
+function getSpecificRecipe (user, recipe)
+{
+    const docID = user + "_" + recipe;
+    return new Promise ((resolve, reject) => {
+        const docRef = doc(database, "recipes", docID);
+        getDoc (docRef)
+        .then((docSnap) =>
+        {
+            if (docSnap.exists())
+            {
+                resolve(docSnap.data());
+            }
+            else
+            {
+                reject({message: "This recipe does not exist"});
+            }
+        })
+        .catch((error) =>
+        {
+            console.log(error);
+            reject(error);
+        })
+    });
+}
+
+module.exports = {database, addRecipeToBook, removeRecipeFromBook, readRecipes, getSpecificRecipe};
