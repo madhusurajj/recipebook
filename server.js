@@ -11,10 +11,6 @@ app.use(cors({
     origin: "localhost:4200"
 })); 
 
-// // configure the app to use bodyParser()
-// app.use(bodyParser.urlencoded({
-//     extended: true
-// }));
 
 //middleware to parse JSON post req body
 app.use(bodyParser.json());
