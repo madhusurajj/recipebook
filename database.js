@@ -1,5 +1,5 @@
 const firebase = require('firebase/app');
-const { getFirestore, collection, addDoc, query, doc, deleteDoc, getDocs, where} = require("firebase/firestore");
+const { getFirestore, collection, setDoc, query, doc, deleteDoc, getDocs, where} = require("firebase/firestore");
 
 const firebaseConfig = require("./firebase-config.json")
 
@@ -10,13 +10,15 @@ const {filterForIngredients} = require("./util.js");
 
 //add to realtime database using reference with user id
 //add/update ingredients with optional param
-async function addRecipeToBook(user, name, ingredient = null)
+async function addRecipeToBook(user, name, ingredients = null)
 {
     return new Promise ((resolve) => {
-        const recipeDocRef = addDoc(collection(database, "recipes"), 
+        console.log(ingredients);
+        setDoc(doc(database, "recipes", name), 
         {
             userID: user,
-            recipeName: name
+            recipeName: name,
+            ingredients: ingredients
         })
         .then (() => {
             resolve();
