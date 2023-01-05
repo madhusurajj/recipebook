@@ -11,7 +11,6 @@ app.use(cors({
     origin: "localhost:4200"
 })); 
 
-
 //middleware to parse JSON post req body
 app.use(bodyParser.json());
 
@@ -33,7 +32,9 @@ app.get('/users/:userID', cors(), (req, res) => {
 
 //HTTP POST response to create new recipes
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
-    addRecipeToBook (req.params.userID, req.params.recipeName, null)
+    let ingredients = null;
+    if (req.body) ingredients = req.body["ingredients"]
+    addRecipeToBook (req.params.userID, req.params.recipeName, ingredients)
     .then (() =>
     {
         res.status(201).send({message: "Successfully added recipe"});
