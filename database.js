@@ -30,23 +30,19 @@ async function addRecipeToBook(user, name, ingredients = null)
     });
 }
 
-//delete recipes with this name from firestore
+//delete recipes with using name reference from firestore
 async function removeRecipeFromBook(user, recipe)
 {
     return new Promise (async (resolve, reject) =>  {
-        const q = query(collection(database, "recipes"), where("recipeName", "==", recipe));
-        const snapshotToDelete = await getDocs(q);
-        try
+        deleteDoc(doc(database, "recipes", recipe))
+        .then(() =>
         {
-            snapshotToDelete.forEach(async (document) => {
-                await deleteDoc(doc(database, "recipes", document.id));
-            });
             resolve();
-        }
-        finally 
+        })
+        .catch (() =>
         {
-            reject({message: "Could not delete" + recipe});
-        }
+            reject();
+        });
     });
 }
 
