@@ -1,4 +1,4 @@
-const {readRecipes, addRecipeToBook, removeRecipeFromBook} = require ("./database.js");
+const {readRecipes, addRecipeToBook, removeRecipeFromBook, getSpecificRecipe} = require ("./database.js");
 
 const express = require('express');
 const cors = require ('cors');
@@ -14,20 +14,38 @@ app.use(cors({
 //middleware to parse JSON post req body
 app.use(bodyParser.json());
 
-//HTTP GET response to get all recipes created by a user
-//filter by prep time with query
-app.get('/users/:userID', cors(), (req, res) => {
+//HTTP GET response to get all recipes or a specific one created by a user
+app.get('/users/:userID/:recipename?', cors(), (req, res) => {
     const userID = req.params.userID;
-    readRecipes(userID, req.query.ingredient)
-    .then ((data) =>
+    const recipeName = req.params.recipename;
+    let data;
+    //only fetch specific recipe
+    if (recipeName)
     {
-        res.status(200).json(data);
-    })
-    .catch((reason) => 
-    {
-        res.status(400).send(reason);
+        getSpecificRecipe(userID, recipeName)
+        .then ((data) =>
+        {
+            console.log(data);
+            res.status(200).json(data);
+        })
+        .catch((reason) => 
+        {
+            res.status(400).send(reason);
+        });
     }
-    );
+    //read all recipes for a user
+    else   {
+        readRecipes(userID)
+        .then ((data) =>
+        {
+            console.log("all recipes", data);
+            res.status(200).json(data);
+        })
+        .catch((reason) => 
+        {
+            res.status(400).send(reason);
+        });
+    }
 });
 
 //HTTP POST response to create new recipes
