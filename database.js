@@ -8,16 +8,19 @@ const database = getFirestore(app);
 
 const {filterForIngredients} = require("./util.js");
 
-//add to realtime database using reference with user id
+//add to realtime database using reference with user id and recipe name
 //add/update ingredients with optional param
-async function addRecipeToBook(user, name, ingredients = null)
+async function addRecipeToBook(user, recipename, ingredients = null)
 {
     return new Promise ((resolve) => {
         console.log(ingredients);
-        setDoc(doc(database, "recipes", name), 
+        //id format userid_recipename
+        const docID = user + "_" + recipename;
+        //set overwrites duplicates -> only one instance of each recipe per user
+        setDoc(doc(database, "recipes", docID), 
         {
             userID: user,
-            recipeName: name,
+            recipeName: recipename,
             ingredients: ingredients
         })
         .then (() => {
@@ -34,7 +37,8 @@ async function addRecipeToBook(user, name, ingredients = null)
 async function removeRecipeFromBook(user, recipe)
 {
     return new Promise (async (resolve, reject) =>  {
-        deleteDoc(doc(database, "recipes", recipe))
+        const toDeleteID = user + "_" + recipe;
+        deleteDoc(doc(database, "recipes", toDeleteID))
         .then(() =>
         {
             resolve();
@@ -52,7 +56,7 @@ function readRecipes (user)
 {
     let recipesAsJson = {};
     return new Promise (async (resolve, reject) => {
-        const q = query(collection(database, "recipes"), where("userID", "==", user));
+        const q = query(collection(database, "recipes"), where("userID", "==", user), where("ingredients", "array-contains", ingredient));
         const querySnapshot = await getDocs(q);
         let enumeration = 0;
         querySnapshot.forEach((doc) => {
@@ -62,4 +66,5 @@ function readRecipes (user)
         resolve(recipesAsJson);
     });
 }
+
 module.exports = {database, addRecipeToBook, removeRecipeFromBook, readRecipes};
