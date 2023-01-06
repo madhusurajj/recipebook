@@ -6,14 +6,11 @@ const firebaseConfig = require("./firebase-config.json")
 const app = firebase.initializeApp(firebaseConfig);
 const database = getFirestore(app);
 
-const {filterForIngredients} = require("./util.js");
-
 //add to realtime database using reference with user id and recipe name
 //add/update ingredients with optional param
-async function addRecipeToBook(user, recipename, ingredients, flags)
+async function addRecipeToBook(user, recipename, ingredients, attributes)
 {
     return new Promise ((resolve) => {
-        console.log(ingredients);
         //id format userid_recipename
         const docID = user + "_" + recipename;
         //set overwrites duplicates -> only one instance of each recipe per user
@@ -22,7 +19,7 @@ async function addRecipeToBook(user, recipename, ingredients, flags)
             userID: user,
             recipeName: recipename,
             ingredients: ingredients,
-            flags
+            attributes
         })
         .then (() => {
             resolve();
@@ -53,19 +50,34 @@ async function removeRecipeFromBook(user, recipe)
 
 //listen for changes in this user's recipe list' and retrieve
 //access all recipe documents in the collection, querying by userID
-function readRecipes (user)
+function readRecipes (user, dietaryfilter)
 {
     let recipesAsJson = {};
     return new Promise (async (resolve, reject) => {
-        const q = query(collection(database, "recipes"), where("userID", "==", user));
-        const querySnapshot = await getDocs(q);
-        let enumeration = 0;
-        querySnapshot.forEach((doc) => {
-            recipesAsJson[enumeration] = doc.data();
-            enumeration++;
+        let q; 
+        //compound query to add filter
+        if (dietaryfilter)
+        {
+            const attributeFieldPath = "attributes." + dietaryfilter; //eg attributes.vegetarian
+            q = query(collection(database, "recipes"), where("userID", "==", user), where (attributeFieldPath, "==", true));
+        }
+        else
+        {
+            q = query(collection(database, "recipes"), where("userID", "==", user));
+        }
+        getDocs(q)
+        .then((querySnapshot) => {
+            let enumeration = 0;
+            querySnapshot.forEach((doc) => {
+                recipesAsJson[enumeration] = doc.data();
+                enumeration++;
+            });
+            console.log(recipesAsJson);
+            resolve(recipesAsJson);
+        })
+        .catch((reason) => {
+            reject(reason);
         });
-        console.log(recipesAsJson);
-        resolve(recipesAsJson);
     });
 }
 
