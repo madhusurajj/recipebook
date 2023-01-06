@@ -15,10 +15,10 @@ app.use(cors({
 app.use(bodyParser.json());
 
 //HTTP GET response to get all recipes or a specific one created by a user
+//for reading all recipes: handle optional query for dietary filter: 
 app.get('/users/:userID/:recipename?', cors(), (req, res) => {
     const userID = req.params.userID;
     const recipeName = req.params.recipename;
-    let data;
     //only fetch specific recipe
     if (recipeName)
     {
@@ -35,7 +35,8 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
     }
     //read all recipes for a user
     else   {
-        readRecipes(userID)
+        const searchedFlags = req.query.dietaryfilter;
+        readRecipes(userID, searchedFlags)
         .then ((data) =>
         {
             console.log("all recipes", data);
@@ -49,11 +50,12 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
 });
 
 //HTTP POST response to create new recipes
-//ingredients are sent as JSON in request body
-/*individual attributes specified using flags, since firestore doesn't support AND for array-contains*/
+//ingredients, attributes are sent as JSON in request body
+/*attributes ('vegan', 'peanut-free', etc) specified using flags- firestore doesn't support the logical AND for array-contains*/
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
     const ingredients = req.body["ingredients"];
     const flags = req.body["flags"];
+    console.log(flags)
     addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags)
     .then (() =>
     {
