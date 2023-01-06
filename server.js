@@ -49,10 +49,12 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
 });
 
 //HTTP POST response to create new recipes
+//ingredients are sent as JSON in request body
+/*individual attributes specified using flags, since firestore doesn't support AND for array-contains*/
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
-    let ingredients = null;
-    if (req.body) ingredients = req.body["ingredients"]
-    addRecipeToBook (req.params.userID, req.params.recipeName, ingredients)
+    const ingredients = req.body["ingredients"];
+    const flags = req.body["flags"];
+    addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags)
     .then (() =>
     {
         res.status(201).send({message: "Successfully added recipe"});

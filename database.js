@@ -10,7 +10,7 @@ const {filterForIngredients} = require("./util.js");
 
 //add to realtime database using reference with user id and recipe name
 //add/update ingredients with optional param
-async function addRecipeToBook(user, recipename, ingredients = null)
+async function addRecipeToBook(user, recipename, ingredients, flags)
 {
     return new Promise ((resolve) => {
         console.log(ingredients);
@@ -21,7 +21,8 @@ async function addRecipeToBook(user, recipename, ingredients = null)
         {
             userID: user,
             recipeName: recipename,
-            ingredients: ingredients
+            ingredients: ingredients,
+            flags
         })
         .then (() => {
             resolve();
