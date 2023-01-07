@@ -19,13 +19,12 @@ app.use(bodyParser.json());
 app.get('/users/:userID/:recipename?', cors(), (req, res) => {
     const userID = req.params.userID;
     const recipeName = req.params.recipename;
-    //only fetch specific recipe
+    //only fetch one specific recipe
     if (recipeName)
     {
         getSpecificRecipe(userID, recipeName)
         .then ((data) =>
         {
-            console.log(data);
             res.status(200).json(data);
         })
         .catch((reason) => 
@@ -39,7 +38,6 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
         readRecipes(userID, searchedFlags)
         .then ((data) =>
         {
-            console.log("all recipes", data);
             res.status(200).json(data);
         })
         .catch((reason) => 
@@ -55,7 +53,6 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
 app.post('/users/:userID/:recipeName', cors(), (req, res) => {
     const ingredients = req.body["ingredients"];
     const flags = req.body["flags"];
-    console.log(flags)
     addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags)
     .then (() =>
     {
