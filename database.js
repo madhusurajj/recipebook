@@ -54,12 +54,19 @@ function readRecipes (user, dietaryfilter)
 {
     let recipesAsJson = {};
     return new Promise (async (resolve, reject) => {
-        let q; 
-        //compound query to add filter
+        let q = query(collection(database, "recipes"), where("userID", "==", user));
+        //dynamically build compound query using array of flag values
         if (dietaryfilter)
         {
-            const attributeFieldPath = "attributes." + dietaryfilter; //eg attributes.vegetarian
-            q = query(collection(database, "recipes"), where("userID", "==", user), where (attributeFieldPath, "==", true));
+            if (typeof dietaryfilter == 'string')
+            {
+                dietaryfilter = [dietaryfilter];
+            }
+            dietaryfilter.forEach((filter) =>
+            {
+                const attributeFieldPath = "attributes." + filter;
+                q = query(q, where (attributeFieldPath, "==", true));
+            });
         }
         else
         {
@@ -72,7 +79,6 @@ function readRecipes (user, dietaryfilter)
                 recipesAsJson[enumeration] = doc.data();
                 enumeration++;
             });
-            console.log(recipesAsJson);
             resolve(recipesAsJson);
         })
         .catch((reason) => {
