@@ -88,7 +88,12 @@ app.post('/users/:userID/:recipeName',
 });
 
 //HTTP DELETE response to create new recipes
-app.delete('/users/:userID/:recipeName', cors(), (req, res) => {
+app.delete('/users/:userID/:recipeName', 
+    [
+        check("userID").isString(),
+        check("recipeName").isString()
+    ], 
+    (req, res) => {
     removeRecipeFromBook (req.params.userID, req.params.recipeName)
     .then ((message) =>
     {
