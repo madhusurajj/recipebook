@@ -3,10 +3,12 @@ const {readRecipes, addRecipeToBook, removeRecipeFromBook, getSpecificRecipe} = 
 const express = require('express');
 const cors = require ('cors');
 const bodyParser = require("body-parser");
+const { checkSchema, validationResult } = require('express-validator');
 
 const app = express();
+const {addRecipeSchema} = require ("./data-validators/add-recipe-schema.ts"); 
 
-//middleware to allow browser requests from cross-origin domains
+//middleware to allow browser requests from cross-origin domains 
 app.use(cors({
     origin: "localhost:4200"
 })); 
@@ -16,9 +18,10 @@ app.use(bodyParser.json());
 
 //HTTP GET response to get all recipes or a specific one created by a user
 //for reading all recipes: handle optional query for dietary filter: 
-app.get('/users/:userID/:recipename?', cors(), (req, res) => {
+app.get('/users/:userID/:recipename?', (req, res) => {
     const userID = req.params.userID;
     const recipeName = req.params.recipename;
+
     //only fetch one specific recipe
     if (recipeName)
     {
@@ -33,7 +36,8 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
         });
     }
     //read all recipes for a user
-    else   {
+    else
+    {
         const searchedFlags = req.query.dietaryfilter;
         readRecipes(userID, searchedFlags)
         .then ((data) =>
@@ -49,8 +53,18 @@ app.get('/users/:userID/:recipename?', cors(), (req, res) => {
 
 //HTTP POST response to create new recipes
 //ingredients, attributes are sent as JSON in request body
-/*attributes ('vegan', 'peanut-free', etc) specified using flags- firestore doesn't support the logical AND for array-contains*/
-app.post('/users/:userID/:recipeName', cors(), (req, res) => {
+app.post('/users/:userID/:recipeName', checkSchema(addRecipeSchema), (req, res) => {
+    const errors = validationResult (req); 
+    if (!errors.isEmpty())
+    {
+        errorMessages = [];
+        for (const error of errors.errors)
+        {
+            errorMessages.push(error.msg);
+        }
+        res.status(400).send(errorMessages);
+        return; 
+    }
     const ingredients = req.body["ingredients"];
     const flags = req.body["flags"];
     addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags)
