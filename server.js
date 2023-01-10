@@ -7,6 +7,7 @@ const { checkSchema, validationResult } = require('express-validator');
 
 const app = express();
 const {addRecipeSchema} = require ("./data-validators/add-recipe-schema.ts"); 
+const { check } = require("express-validator/src/middlewares/validation-chain-builders.js");
 
 //middleware to allow browser requests from cross-origin domains 
 app.use(cors({
@@ -53,7 +54,15 @@ app.get('/users/:userID/:recipename?', (req, res) => {
 
 //HTTP POST response to create new recipes
 //ingredients, attributes are sent as JSON in request body
-app.post('/users/:userID/:recipeName', checkSchema(addRecipeSchema), (req, res) => {
+app.post('/users/:userID/:recipeName', 
+    //use express validators middleware to check queries, params with default errors
+    //check post req JSON body using custom schema and error messages
+    [
+        checkSchema(addRecipeSchema), 
+        check("userID").isString(),
+        check("recipeName").isString()
+    ],
+    (req, res) => {
     const errors = validationResult (req); 
     if (!errors.isEmpty())
     {
