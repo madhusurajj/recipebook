@@ -1,5 +1,5 @@
 const {uploadBytes, ref, getDownloadURL } = require("firebase/storage");
-const {app, storage} = require ("../setup")
+const {app, storage} = require ("./setup")
 
 /*
     * Uploads binary image data to storage bucket in path ./userID/recipeName

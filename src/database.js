@@ -4,7 +4,7 @@
         document queries.
 */
 const {collection, setDoc, query, doc, deleteDoc, getDoc, getDocs, where} = require("firebase/firestore");
-const {database} = require ("../setup")
+const {database} = require ("./setup")
 const {storageUploadImage} = require ("./storage")
 
 /*
