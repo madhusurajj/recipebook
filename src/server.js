@@ -1,9 +1,13 @@
+/* 
+    * Defines routes and endpoints to edit recipe book, login, and signup.
+*/
 const {readRecipes, addRecipeToBook, removeRecipeFromBook, getSpecificRecipe} = require ("./database.js");
 
 const express = require('express');
 const cors = require ('cors');
 const bodyParser = require("body-parser");
 const { checkSchema, validationResult } = require('express-validator');
+const {signup, signin} = require ("./auth.js")
 
 const app = express();
 const {addRecipeSchema} = require ("./data-validators/add-recipe-schema.ts"); 
@@ -124,6 +128,43 @@ app.delete('/users/:userID/:recipeName',
     .catch ((message) => 
     {
         res.status(400).send(message);; 
+    })
+});
+
+/* 
+    HTTP POST response to create an account / sign up
+    Email / password combo are passed in as JSON in request body
+    Returns a JSON Web Token that the client can send in header of future requests
+*/
+app.post('/signup', 
+    [
+        //add further validation here 
+        check("username").isString(),
+        check("password").isString()
+    ], 
+    (req, res) => {
+    signup (req.body.email, req.body.password)
+    .then ((userToken) =>  {
+        res.status(201).send(userToken);
+    })
+    .catch (() => {
+        res.status(400).send({message: "Could not create an account for this user"});
+    })
+});
+
+app.post('/login', 
+    [
+        //add further validation here 
+        check("username").isString(),
+        check("password").isString()
+    ], 
+    (req, res) => {
+    signin (req.body.email, req.body.password)
+    .then ((userToken) =>  {
+        res.status(201).send(userToken);
+    })
+    .catch (() => {
+        res.status(401).send({message: "Invalid email/password: unable to authenticate this user"});
     })
 });
 
