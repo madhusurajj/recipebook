@@ -152,6 +152,11 @@ app.post('/signup',
     })
 });
 
+/* 
+    HTTP POST response to log in
+    Email / password combo are passed in as JSON in request body
+    Returns a JSON Web Token that the client can send in header of future requests
+*/
 app.post('/login', 
     [
         //add further validation here 

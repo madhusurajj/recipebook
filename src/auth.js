@@ -1,5 +1,5 @@
 const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require( "firebase/auth");
-
+const {admin} = require("../firebase/admin-sdk")
 const auth = getAuth();
 
 /* Signs up using email-password combo and return JWT upon success */
@@ -48,4 +48,19 @@ function signin (email, password) {
     });
 }
 
-module.exports= {signin, signup};
+/* Decode JWT passed in from client and extract userID */
+function authenticateByJWT (jwt)
+{
+    return new Promise ((resolve, reject) => {
+        admin.auth.verifyIdToken(jwt)
+        .then ((decodedUser) => {
+            console.log("Success!");
+            resolve(decodedUser.uid);
+        })
+        .catch ((error) => {
+            reject(error); 
+        });
+    })
+
+}
+module.exports= {signin, signup, authenticateByJWT};
