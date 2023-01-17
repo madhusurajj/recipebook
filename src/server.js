@@ -89,8 +89,10 @@ app.post('/users/:userID/:recipeName',
             res.status(400).send(errorMessages);
             return; 
         }
+        //req body is passed in through form-data, so stringified data must be converted to json
         const ingredients = JSON.parse(req.body.ingredients);
-        const flags = req.body["flags"];
+        const flags = JSON.parse(req.body.attributes);
+        console.log("flags:" + flags);
         //object created by multer in req.file storing image buffer and metadata
         const image = req.file; 
         addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags, image)
