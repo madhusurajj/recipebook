@@ -9,13 +9,17 @@ function storageUploadImage (image, refUrl)
 {
     return new Promise ((resolve, reject) => 
     {
-        if (image == null) return null; 
+        //if no image uploaded -> send null url
+        if (image == null) 
+        {
+            resolve(null);
+            return; 
+        }
         const bucketRef = ref(storage, refUrl);
         uploadBytes(bucketRef, image.buffer)
         .then(() => {
             getDownloadURL(bucketRef)
             .then((url) => {
-                console.log(url);
                 resolve(url);
             });
         })

@@ -17,6 +17,7 @@ function addRecipeToBook(user, recipename, ingredients, attributes = null, image
     return new Promise (async (resolve, reject) => {
         //id format userid_recipename
         const docID = user + "_" + recipename;
+        
         //first store image (if it exists) in cloud storage, and put link in db -> more scalable
         const bucketUrl = user + "/" + recipename;
         //returns download url
@@ -39,6 +40,10 @@ function addRecipeToBook(user, recipename, ingredients, attributes = null, image
             {
                 reject(message);
             })
+        })
+        .catch((error) => {
+            console.log(error);
+            reject();
         });
     });
 }
