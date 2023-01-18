@@ -7,7 +7,7 @@ const express = require('express');
 const cors = require ('cors');
 const bodyParser = require("body-parser");
 const { checkSchema, validationResult } = require('express-validator');
-const {signup, signin} = require ("./auth.js")
+const {signup, signin, authenticateByJWT} = require ("./auth.js")
 
 const app = express();
 const {addRecipeSchema} = require ("./data-validators/add-recipe-schema.ts"); 
@@ -15,6 +15,8 @@ const { check } = require("express-validator/src/middlewares/validation-chain-bu
 
 //middleware to handle image file uploads
 const multer = require('multer');
+const { resolve } = require("path");
+const { rejects } = require("assert");
 const upload = multer();
 
 //middleware to allow browser requests from cross-origin domains 
@@ -33,34 +35,50 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/users/:userID/:recipename?', (req, res) => {
     const userID = req.params.userID;
     const recipeName = req.params.recipename;
-
-    //only fetch a specific recipe
-    if (recipeName)
-    {
-        getSpecificRecipe(userID, recipeName)
-        .then ((data) =>
+    //json web token which should have been stored client side after login/signup,
+    //and now is needed to verify actions are authenticated and match the userID
+    const jwt = req.headers.authorization; 
+    console.log(" jwt: ", jwt); 
+    authenticateByJWT(jwt)
+    .then ((jwtDecodedID) => {
+        //if the jwt is valid but doesn't match userID being accessed in recipe book -> status 403 
+        if (jwtDecodedID != userID)
         {
-            res.status(200).json(data);
-        })
-        .catch((reason) => 
+            res.status(403).send({message: "Don't have permission to access this userID"});
+            return;
+        }
+        //only fetch a specific recipe
+        if (recipeName)
         {
-            res.status(400).send(reason);
-        });
-    }
-    //read all recipes for a user
-    else
-    {
-        const searchedFlags = req.query.dietaryfilter;
-        readRecipes(userID, searchedFlags)
-        .then ((data) =>
+            getSpecificRecipe(userID, recipeName)
+            .then ((data) =>
+            {
+                res.status(200).json(data);
+            })
+            .catch((reason) => 
+            {
+                res.status(400).send(reason);
+            });
+        }
+        //read all recipes for a user
+        else
         {
-            res.status(200).json(data);
-        })
-        .catch((reason) => 
-        {
-            res.status(400).send(reason);
-        });
-    }
+            const searchedFlags = req.query.dietaryfilter;
+            readRecipes(userID, searchedFlags)
+            .then ((data) =>
+            {
+                res.status(200).json(data);
+            })
+            .catch((reason) => 
+            {
+                res.status(400).send(reason);
+            });
+        }
+    })
+    .catch(() => {
+        res.status(401).send({message: "Unknown user token"});
+        return;
+    });
 });
 
 /* 
@@ -93,21 +111,38 @@ app.post('/users/:userID/:recipeName',
             res.status(400).send(errorMessages);
             return; 
         }
-        //req body is passed in through multipart/form-data, so stringified data must be converted to json
-        const ingredients = JSON.parse(req.body.ingredients);
-        const flags = JSON.parse(req.body.attributes);
-        console.log("flags:" + flags);
-        //object created by multer in req.file storing image buffer and metadata
-        const image = req.file; 
-        addRecipeToBook (req.params.userID, req.params.recipeName, ingredients, flags, image)
-        .then (() =>
-        {
-            res.status(201).send({message: "Successfully added recipe"});
+        const jwt = req.headers.authorization; 
+        authenticateByJWT(jwt)
+        .then ((jwtDecodedID) => {
+            const userID = req.params.userID;
+            if (jwtDecodedID != userID)
+            {
+                res.status(403).send({message: "Don't have permission to access this userID"});
+                return;
+            }
+            //req body is passed in through multipart/form-data, so stringified data must be converted to json
+            const ingredients = JSON.parse(req.body.ingredients);
+            const flags = JSON.parse(req.body.attributes);
+            //object created by multer in req.file storing image buffer and metadata
+            const image = req.file; 
+            addRecipeToBook (userID, req.params.recipeName, ingredients, flags, image)
+            .then (() =>
+            {
+                res.status(201).send({message: "Successfully added recipe"});
+                resolve();
+                return;
+            })
+            .catch ((message) => 
+            {
+                res.status(400).send(message);
+                reject();
+            });
         })
-        .catch ((message) => 
-        {
-            res.status(400).send(message);; 
-        })
+        .catch((error) => {
+            console.log(error)
+            res.status(401).send({message: "Unknown user token"});
+            return;
+        });
     }
 );
 
@@ -120,14 +155,28 @@ app.delete('/users/:userID/:recipeName',
         check("recipeName").isString()
     ], 
     (req, res) => {
-    removeRecipeFromBook (req.params.userID, req.params.recipeName)
-    .then ((message) =>
-    {
-        res.status(204).send(message);
+        const jwt = req.headers.authorization; 
+        authenticateByJWT(jwt)
+        .then ((jwtDecodedID) => 
+        {
+            if (jwtDecodedID != userID)
+            {
+                res.status(403).send({message: "Don't have permission to access this userID"});
+                return;
+            }    
+        removeRecipeFromBook (req.params.userID, req.params.recipeName)
+        .then ((message) =>
+        {
+            res.status(204).send(message);
+        })
+        .catch ((message) => 
+        {
+            res.status(400).send(message);; 
+        })
     })
-    .catch ((message) => 
-    {
-        res.status(400).send(message);; 
+    .catch (() => {
+        res.status(401).send({message: "Unknown user token"});
+        return;
     })
 });
 
@@ -144,12 +193,12 @@ app.post('/signup',
     ], 
     (req, res) => {
     signup (req.body.email, req.body.password)
-    .then ((userToken) =>  {
-        res.status(201).send(userToken);
+    .then ((userTokenAndID) =>  {
+        res.status(201).json(userTokenAndID);
     })
     .catch (() => {
         res.status(400).send({message: "Could not create an account for this user"});
-    })
+    });
 });
 
 /* 
@@ -165,8 +214,8 @@ app.post('/login',
     ], 
     (req, res) => {
     signin (req.body.email, req.body.password)
-    .then ((userToken) =>  {
-        res.status(201).send(userToken);
+    .then ((userData) =>  {
+        res.status(201).json(userData);
     })
     .catch (() => {
         res.status(401).send({message: "Invalid email/password: unable to authenticate this user"});
