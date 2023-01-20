@@ -1,5 +1,5 @@
 # Recipe Book API
-This is a backend API for a personalized recipe book web application. I've defined endpoints supporting the following features for users:
+This is a backend API for a personalized recipe book web application, developed using Node.js, Express.js, Firebase Cloud Firestore, and Cloud Storage. I've defined endpoints to support the following features for users:
 * Upload recipes with images, ingredients, and key attributes/flags.
 * Search for a specific recipe 
 * Filter for recipes (eg "vegetarian" and "gluten-free")
@@ -63,3 +63,5 @@ These instructions will get a copy of the project up and running on your local m
 *DELETE /users/:userID/:recipeName:* Delete a specific recipe by name.
 *   Parameters: userID, recipeName
 *   Request header: JWT
+
+Express middleware is used to ensure that the data entered into the recipebook is validated and of the expected format, as outlined above.
