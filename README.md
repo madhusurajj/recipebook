@@ -63,3 +63,5 @@ The API will be running at http://localhost:8000
 *DELETE /users/:userID/:recipeName:* Delete a specific recipe by name.
 *   Parameters: userID, recipeName
 *   Request header: JWT
+
+Express middleware is used to ensure that the data entered into the recipebook is validated and of the expected format, as outlined above.
