@@ -13,16 +13,16 @@ Authentication is handled using JSON Web Tokens (JWTs). When a user signs up or 
 These instructions will get a copy of the project up and running on your local machine.
 
 ### Prerequisites
-Node.js
-npm
-Firebase account and a project setup
+* Node.js
+* npm
+* Firebase account and a project setup
 
 #### Installing
-Clone this repository
-Install dependencies using npm install
-Update the admin-private-key-template.json file and the firebase-config-template.json file with the API keys for your Firebase project.
-Start the server using node server
-The API will be running at http://localhost:8000
+* Clone this repository
+* Install dependencies using npm install
+* Update the admin-private-key-template.json file and the firebase-config-template.json file with the API keys for your Firebase project.
+* Start the server by running *node server*
+* The API will be running at http://localhost:8000
 
 ## API Endpoints
 *POST /signup*: Create a new user with email and password.
