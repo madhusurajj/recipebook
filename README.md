@@ -7,7 +7,7 @@ Backend API for a personalized recipe book web application, developed using Node
 * Login/signup with session management.
 
 ## Authentication and Authorization
-Authentication is handled using JSON Web Tokens (JWTs). When a user signs up or logs in, a JWT is returned in the HTTP response body that should be stored securely client side. It should be included in the headers of subsequent HTTP requests to edit a user's recipe book. Firebase Admin SDK is used to generate and verify these tokens which will remain valid for a limited time to handle session management. 
+Authentication is handled using JSON Web Tokens (JWTs). When a user signs up or logs in, a JWT is returned in the HTTP response body that should be stored securely client side. It should be included in the headers of subsequent HTTP requests to edit a user's recipe book. 
 
 ## Getting Started
 These instructions will get a copy of the project up and running on your local machine.
@@ -38,9 +38,9 @@ These instructions will get a copy of the project up and running on your local m
 *POST /users/:userID/:recipeName*: Add a new recipe to a user's recipe book. This endpoint recieves form-data, allowing for direct upload of images. The images will be stored in Cloud Storage, with the link saved in Firestore.
 *   Parameters: userID, recipeName
 *   Request body (form-data as key-value pairs):
-*       Image file
-*       Ingredients: (a string array)
-*       Attributes: (as boolean flags in JSON format, such as {"vegan": true, "low-calorie": false}).
+*    Image file
+*    Ingredients: (a string array)
+*    Attributes: (as boolean flags in JSON format, such as {"vegan": true, "low-calorie": false}).
 *   Request header: JWT
 
 *GET /users/:userID/:* Get all the recipes created by a user
