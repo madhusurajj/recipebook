@@ -1,5 +1,5 @@
 # Recipe Book API
-Backend API for a personalized recipe book web application, developed using Node.js, Express.js, Firebase Cloud Firestore, and Cloud Storage. Endpoints are defined to support the following features for users:
+Backend API for a personalized recipe book web application, developed using Node.js, Express.js, and Cloud Firestore. Endpoints are defined to support the following features for users:
 * Upload recipes with images, ingredients, and key attributes/flags.
 * Search for a specific recipe 
 * Filter for recipes (eg "vegetarian" and "gluten-free")
