@@ -9,20 +9,8 @@ Backend API for a personalized recipe book web application, developed using Node
 ## Authentication and Authorization
 Authentication is handled using JSON Web Tokens (JWTs). When a user signs up or logs in, a JWT is returned in the HTTP response body that should be stored securely client side. It should be included in the headers of subsequent HTTP requests to edit a user's recipe book. 
 
-## Getting Started
-These instructions will get a copy of the project up and running on your local machine.
-
-### Prerequisites
-* Node.js
-* npm
-* Firebase account and a project setup
-
-#### Installing
-* Clone this repository
-* Install dependencies using npm install
-* Update the admin-private-key-template.json file and the firebase-config-template.json file with the API keys for your Firebase project.
-* Start the server by running *node server*
-* The API will be running at http://localhost:8000
+## Using this API
+The API has been deployed to App Engine, and all requests can be sent to the following URL: https://recipe-book-backend-375618.wm.r.appspot.com/
 
 ## API Endpoints
 *POST /signup*: Create a new user with email and password.
@@ -63,5 +51,3 @@ These instructions will get a copy of the project up and running on your local m
 *DELETE /users/:userID/:recipeName:* Delete a specific recipe by name.
 *   Parameters: userID, recipeName
 *   Request header: JWT
-
-Express middleware is used to ensure that the data entered into the recipebook is validated and of the expected format, as outlined above.
