@@ -112,6 +112,7 @@ app.post('/users/:userID/:recipeName',
             return; 
         }
         const jwt = req.headers.authorization; 
+        console.log(jwt); 
         authenticateByJWT(jwt)
         .then ((jwtDecodedID) => {
             const userID = req.params.userID;
@@ -222,6 +223,6 @@ app.post('/login',
     })
 });
 
-app.listen(8000, () => {
+app.listen(8080,'0.0.0.0', () => {
     console.log("Listening on port 8000");
 });
