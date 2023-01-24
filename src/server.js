@@ -223,6 +223,12 @@ app.post('/login',
     })
 });
 
+/* Route to handle situation where a user makes a request to the base URL without any parameters */
+app.get('/', (req, res) => {
+    res.status(404).send({ error: 'Invalid request. Please provide parameters to access recipebook API resources.' });
+  });
+  
+//8080 is the default port used by App Engine
 app.listen(8080,'0.0.0.0', () => {
-    console.log("Listening on port 8000");
+    console.log("Listening on port 8080");
 });
