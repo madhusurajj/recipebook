@@ -23,7 +23,7 @@ const addRecipeSchema = {
                 return true;
             }
         },
-        errorMessage: "Ingredients must be formatted as a JSON string"
+        errorMessage: "Ingredients must be formatted as a stringified array of strings"
     },
     flags: {
         in: "body",
