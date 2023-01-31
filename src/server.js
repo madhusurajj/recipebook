@@ -103,18 +103,20 @@ app.post('/users/:userID/:recipeName',
         const errors = validationResult (req); 
         if (!errors.isEmpty())
         {
+            console.log(errors);
             errorMessages = [];
             for (const error of errors.errors)
             {
                 errorMessages.push(error.msg);
             }
+            console.log("vallidation error:")
             res.status(400).send(errorMessages);
             return; 
         }
         const jwt = req.headers.authorization; 
         console.log(jwt); 
         authenticateByJWT(jwt)
-        .then ((jwtDecodedID) => {
+        .then ((jwtDecodedID, resolve, reject) => {
             const userID = req.params.userID;
             if (jwtDecodedID != userID)
             {
@@ -123,7 +125,11 @@ app.post('/users/:userID/:recipeName',
             }
             //req body is passed in through multipart/form-data, so stringified data must be converted to json
             const ingredients = JSON.parse(req.body.ingredients);
-            const flags = JSON.parse(req.body.attributes);
+            const flags = null;
+            if (req.body.attributes)
+            {
+                JSON.parse(req.body.attributes);
+            }
             //object created by multer in req.file storing image buffer and metadata
             const image = req.file; 
             addRecipeToBook (userID, req.params.recipeName, ingredients, flags, image)
@@ -135,8 +141,9 @@ app.post('/users/:userID/:recipeName',
             })
             .catch ((message) => 
             {
-                res.status(400).send(message);
-                reject();
+                console.log(message);
+                res.status(400).send({message: "Unable to upload recipe for this user- try logging in again"});
+                return;
             });
         })
         .catch((error) => {
@@ -189,7 +196,7 @@ app.delete('/users/:userID/:recipeName',
 app.post('/signup', 
     [
         //add further validation here 
-        check("username").isString(),
+        check("email").isString(),
         check("password").isString()
     ], 
     (req, res) => {
@@ -210,7 +217,7 @@ app.post('/signup',
 app.post('/login', 
     [
         //add further validation here 
-        check("username").isString(),
+        check("email").isString(),
         check("password").isString()
     ], 
     (req, res) => {
@@ -225,7 +232,7 @@ app.post('/login',
 
 /* Route to handle situation where a user makes a request to the base URL without any parameters */
 app.get('/', (req, res) => {
-    res.status(404).send({ error: 'Invalid request. Please provide parameters to access recipebook API resources.' });
+    res.status(404).send({ message: 'Invalid request. Please provide parameters to access recipebook API resources.' });
   });
   
 //8080 is the default port used by App Engine

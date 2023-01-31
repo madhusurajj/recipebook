@@ -38,12 +38,11 @@ function addRecipeToBook(user, recipename, ingredients, attributes = null, image
             })
             .catch ((message) =>
             {
-                reject(message);
+                reject();
             })
         })
-        .catch((error) => {
-            console.log(error);
-            reject();
+        .catch(() => {
+            reject("User is not authorized to write to this storage bucket.");
         });
     });
 }
