@@ -232,7 +232,7 @@ app.post('/login',
 
 /* Route to handle situation where a user makes a request to the base URL without any parameters */
 app.get('/', (req, res) => {
-    res.status(404).send('This is the base URL for my recipebook API. Please provide parameters to access API resources.' );
+    res.status(404).send('You have reached the base URL for my recipebook API. Please provide parameters to access API resources.' );
   });
   
 //8080 is the default port used by App Engine
